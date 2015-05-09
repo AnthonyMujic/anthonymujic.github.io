@@ -2,7 +2,7 @@
 title: Notes from the Plant
 email: anthony.mujic@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  Thought on control systems, industrial automation, ladder logic and agile software development.
+  Thoughts on control systems, industrial automation, ladder logic and agile software development.
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://yourdomain.com" # the base hostname & protocol for your site
 github_username:  AnthonyMujic
