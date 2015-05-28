@@ -1,6 +1,7 @@
 ---
 layout: post
 title: RTFM
+
 ---
 
 
@@ -13,3 +14,11 @@ I consider this some of the worst advice I ever received. I don't swear much, it
 After this disputable pearl of wisdom, my manager told me that to improve technically the best place to start is to RTFM. Not having a suitably soiled potty mouth I did not realise it stood for "Read The _ Manual" (Nope, still doesn't sound right). He went on to explain that when he started, he would find manuals for what ever piece of hardware he was working on and read it cover to cover. He read the documentation on all PLC instructions for the brand of PLC he was working on. He would read manuals while on the train or at home after work.
 
 I consider this one of the most valuable pieces of advice I received while at that company. I gave it a go. After a while you start to realise that most manuals are similar. Once you have seen a cross range of equipment, new equipment that does the same thing is no longer daunting. You learn how things work and that removes the mystery. When you are faced with a new job, using equipment you have never used before, you are confident that it probably operates like some other thing you have experience with. Or that it will be easy to get the information that you need to work it out from the manual. Manuals are jam packed with useful information – who would have thought?
+
+
+
+
+
+
+
+
