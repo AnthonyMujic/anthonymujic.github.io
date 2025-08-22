@@ -1,0 +1,125 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="/assets/css/classless.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+</head>
+
+<body>
+  <nav>
+    <ul>
+      <li>Anthony Mujic</li>
+      <li class="float-right"><a href="https://github.com/AnthonyMujic"><img src="/images/github-mark.svg" alt="Github"
+            width="25" height="25"></a></li>
+      <li class="float-right"><a href="https://www.linkedin.com/in/anthonymujic/"><img src="/images/LI-In-Bug.png"
+            alt="LinkedIn" width="29" height="25"></a></li>
+    </ul>
+  </nav>
+  <article>
+    <h2>
+      On the dangers of minimalism in web applications</h2>
+
+    <p>
+      I prefer to keep things simple. I like the feel of Sinatra in Ruby or Bottle in Python. A request comes in, it
+      matches a route, you do some work, and send the response back. Simple and easy to follow. Nothing is hidden,
+      everything is right there. </p>
+    <p>
+      I use Phoenix because it is the canonical web framework in Elixir, and a lot of useful libraries are designed
+      for it (site_encrypt, phx_gen_auth etc.). Phoenix often feels a bit complicated for what I am trying to do, so
+      when
+      I can go for a more Sinatra feel of matching a route and hand crafting a response I will.</p>
+    <p>
+      I recently decided to create an application to host my blog articles using this minimalist approach. In the
+      process
+      I introduced a vulnerability – see if you notice it.</p>
+    <h2>
+      Minimalist approach</h2>
+    <p>
+      Hosting my blog is very basic, when a request comes in, send a html file back. How can I do this the simplest way
+      possible? When a request comes into my router, invoke a controller action that returns the requested blog article.
+    </p>
+    <p>
+      I added this line to my router.ex file:</p>
+    <pre><code class="elixir">get &quot;/blog/:url&quot;, PageController, :blog</code></pre>
+    <p>
+      In my page controller, I added the blog function. It gets the url from the request, checks if the requested file
+      exists in priv/static/blog/, and if it does, it sends the file back to the user. If it does not exist I send back
+      a
+      helpful message:</p>
+    <pre><code class="elixir">
+  def blog(conn, params) do
+    path = Path.join([Application.app_dir(:my_app, &quot;priv/static/blog/&quot;), params[&quot;url&quot;]])
+
+    if File.exists?(path) do
+      conn
+      |&gt; put_resp_header(&quot;content-type&quot;, &quot;text/html; charset=utf-8&quot;)
+      |&gt; Plug.Conn.send_file(200, path)
+    else
+      conn
+      |&gt; put_resp_header(&quot;content-type&quot;, &quot;text/html; charset=utf-8&quot;)
+      |&gt; Plug.Conn.send_resp(200, &quot;Does not exist&quot;)
+    end
+  end</code></pre>
+    <p>
+      Did you see the vulnerability? Neither did I. Until one night I was lying awake in bed, turning the design over in
+      my head. What if the request in the url was for other files in the blog directory - that shouldn’t matter too
+      much,
+      I should only store blog articles in there.</p>
+    <p>
+      What if the request tried to get a file from a parent directory? I got up to give it a try. I put a file called
+      hidden.txt in the parent directory, then tried to navigate to:</p>
+    <pre><code>/blog/../hidden.txt</code></pre>
+    <p>
+      Nothing. Great, nothing to worry about. Then I noticed in the console the url parameter was “hidden.txt” - no
+      mention of “../“, which was curious. Perhaps the web browser is discarding the “../“.</p>
+    <p>
+      I tried replacing the “/“ with url encoded equivalent of “%2F”:</p>
+    <pre><code>/blog/..%2Fhidden.txt</code></pre>
+    <p>
+      It worked! The contents of the file were displayed in the browser. Ok, I could see a file in the parent directory,
+      but could
+      I
+      see files outside the application:</p>
+    <pre><code>/blog/..%2F..%2F..%2F..%2F..%2F..%2F..%2F..%2Fetc%2Fpasswd</code></pre>
+    <p>
+      Oh dear! There for all to see was the contents of my /etc/passwd file in my web browser…</p>
+    <p>
+      This is known as a path traversal vulnerability. Ten points if you spotted it.</p>
+    <p>
+      I wonder if how Phoenix serves static assets is susceptible to the same vulnerability. Nope, plug.static checks
+      for
+      invalid urls <a
+        href="https://github.com/elixir-plug/plug/blob/8f1bf1cf1a0270f7b88fd66e055c910de8adb532/lib/plug/static.ex#L433">here</a>,
+      so Phoenix is safe.</p>
+    <h2>
+      Simpler approach</h2>
+    <p>
+      Phoenix has solved this issue for it’s static assets. Hang on a second, my blog is a static asset. It isn’t
+      dynamic.
+      Maybe I could get away with removing the above code and just adding the word ‘blog’ to the config of Plug.Static
+      in
+      the endpoint.ex file:</p>
+    <pre><code>    only: ~w(blog assets fonts images favicon.ico robots.txt)</code></pre>
+    <p>
+      Adding one word - hard to get much simpler than that.</p>
+    <h2>
+      Conclusions</h2>
+    <p>
+      Trying to break your own applications is a great way to learn about security.</p>
+    <p>
+      Years of experience and hard won knowledge has been poured into the popular web frameworks (Phoenix,
+      Rails, Django, Laravel etc.). Straying from the ordained way in pursuit of simplicity can be counter productive if
+      you introduce other issues.</p>
+    <p>
+    </p>
+    <p>
+    </p>
+    </br>
+    </br>
+    </br>
+    </br>
+  </article>
+</body>
+
+</html>
